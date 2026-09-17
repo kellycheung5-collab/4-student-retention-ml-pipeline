@@ -1,7 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import joblib
 import pandas as pd
@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / "models" / "early_warning_pipeline.joblib"
 
-# Global application state
-pipeline_artifact: Optional[Any] = None
-shap_explainer: Optional[shap.TreeExplainer] = None
+# Global application state using modern Python 3.10+ union syntax
+pipeline_artifact: Any | None = None
+shap_explainer: shap.TreeExplainer | None = None
 
 
 class StudentFeatures(BaseModel):
@@ -67,11 +67,11 @@ class RiskFactor(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    student_id: Optional[str] = None
+    student_id: str | None = None
     dropout_probability: float
     is_high_risk: bool
     decision_threshold: float
-    top_risk_factors: List[RiskFactor] = []
+    top_risk_factors: list[RiskFactor] = []
 
 
 @asynccontextmanager
@@ -80,10 +80,10 @@ async def lifespan(app: FastAPI):
     global pipeline_artifact, shap_explainer
 
     if not MODEL_PATH.exists():
-        logger.error(f"Model file not found at {MODEL_PATH}")
+        logger.error("Model file not found at %s", MODEL_PATH)
         raise FileNotFoundError(f"Model artifact missing: {MODEL_PATH}")
 
-    logger.info(f"Loading pipeline artifact from {MODEL_PATH}")
+    logger.info("Loading pipeline artifact from %s", MODEL_PATH)
     pipeline_artifact = joblib.load(MODEL_PATH)
 
     try:
@@ -95,8 +95,8 @@ async def lifespan(app: FastAPI):
         logger.info("Initializing SHAP TreeExplainer...")
         shap_explainer = shap.TreeExplainer(model_step)
         logger.info("SHAP TreeExplainer initialized successfully.")
-    except Exception as e:
-        logger.warning(f"Failed to initialize SHAP TreeExplainer: {e}")
+    except Exception as e:  # noqa: BLE001
+        logger.warning("Failed to initialize SHAP TreeExplainer: %s", e)
         shap_explainer = None
 
     yield
@@ -115,7 +115,7 @@ app = FastAPI(
 
 
 @app.get("/health", status_code=status.HTTP_200_OK)
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """Health check endpoint validating pipeline availability."""
     if pipeline_artifact is None:
         raise HTTPException(
@@ -132,7 +132,7 @@ async def health_check() -> Dict[str, Any]:
 @app.post("/predict", response_model=PredictionResponse, status_code=status.HTTP_200_OK)
 async def predict_dropout_risk(
     features: StudentFeatures,
-    student_id: Optional[str] = Query(None, description="Optional unique identifier for student tracking"),
+    student_id: str | None = Query(None, description="Optional unique identifier for student tracking"),
     threshold: float = Query(0.35, ge=0.0, le=1.0, description="Risk classification probability threshold"),
 ) -> PredictionResponse:
     """Predict student dropout risk and return top positive SHAP risk attributions."""
@@ -149,7 +149,7 @@ async def predict_dropout_risk(
         dropout_prob = float(probabilities[0][1])
         is_high_risk = dropout_prob >= threshold
 
-        top_risk_factors: List[RiskFactor] = []
+        top_risk_factors: list[RiskFactor] = []
 
         if shap_explainer is not None:
             if hasattr(pipeline_artifact, "named_steps"):
@@ -192,8 +192,8 @@ async def predict_dropout_risk(
         )
 
     except Exception as e:
-        logger.error(f"Inference error: {e}", exc_info=True)
+        logger.exception("Inference error occurred during prediction.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Inference execution failed: {str(e)}",
+            detail=f"Inference execution failed: {e!s}",
         )
