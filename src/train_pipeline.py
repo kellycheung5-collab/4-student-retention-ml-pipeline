@@ -1,4 +1,5 @@
 import os
+
 import joblib
 import mlflow
 import mlflow.sklearn
@@ -16,7 +17,6 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-import sklearn.tree._tree
 
 
 def load_processed_data(data_path: str):
