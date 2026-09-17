@@ -141,7 +141,7 @@ def train_and_evaluate_all(
             mlflow.sklearn.log_model(
                 pipeline,
                 artifact_path="model",
-                skops_trusted_types=["sklearn.tree._tree.Tree"],
+                skops_trusted_types=True,
             )
 
             print(f"\n--- {model_name} Results ---")
