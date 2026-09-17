@@ -15,15 +15,17 @@ async def client():
 
 @pytest.mark.anyio
 async def test_health_check(client: AsyncClient):
-    """Verify that the health check endpoint returns 200 OK and healthy status."""
+    """Verify that the health check endpoint returns 200 OK and SHAP readiness."""
     response = await client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert "shap_explainer_ready" in data
 
 
 @pytest.mark.anyio
 async def test_predict_success_low_risk(client: AsyncClient):
-    """Test valid prediction payload returning low risk."""
+    """Test valid prediction payload returning low risk and SHAP risk factors."""
     payload = {
         "Marital status": 1,
         "Application mode": 1,
@@ -64,6 +66,15 @@ async def test_predict_success_low_risk(client: AsyncClient):
     assert "dropout_probability" in data
     assert "is_high_risk" in data
     assert data["decision_threshold"] == 0.35
+    
+    # Validate SHAP risk factors payload structure
+    assert "top_risk_factors" in data
+    assert isinstance(data["top_risk_factors"], list)
+    if len(data["top_risk_factors"]) > 0:
+        factor = data["top_risk_factors"][0]
+        assert "feature" in factor
+        assert "shap_value" in factor
+        assert "feature_value" in factor
 
 
 @pytest.mark.anyio
