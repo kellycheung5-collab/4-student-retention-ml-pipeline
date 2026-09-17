@@ -117,6 +117,7 @@ __marimo__/
 # Data Directories & Downloaded CSVs
 data/raw/*
 data/processed/*
+!data/raw/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 

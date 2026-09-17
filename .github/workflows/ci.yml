@@ -33,6 +33,7 @@ jobs:
       - name: Train ML Pipeline Artifact
         run: |
           mkdir -p models data/processed
+          python src/load_data.py
           python src/train_pipeline.py
 
       - name: Execute Pytest Suite
