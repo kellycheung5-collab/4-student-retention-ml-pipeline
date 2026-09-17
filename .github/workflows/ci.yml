@@ -29,17 +29,10 @@ jobs:
       - name: Run Ruff Linter
         run: |
           python -m ruff check .
-          
-      - name: Train ML Pipeline Artifact
-        run: |
-          mkdir -p models data/processed
-          # Run data processing/ingest first if present:
-          python src/data_preprocessing.py || python src/make_dataset.py || true
-          python src/train_pipeline.py
 
       - name: Train ML Pipeline Artifact
         run: |
-          mkdir -p models
+          mkdir -p models data/processed
           python src/train_pipeline.py
 
       - name: Execute Pytest Suite
@@ -67,7 +60,7 @@ jobs:
 
       - name: Train ML Pipeline Artifact
         run: |
-          mkdir -p models
+          mkdir -p models data/processed
           python src/train_pipeline.py
 
       - name: Set up Docker Buildx
