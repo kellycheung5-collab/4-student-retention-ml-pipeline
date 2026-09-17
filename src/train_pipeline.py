@@ -1,5 +1,4 @@
 import os
-
 import joblib
 import mlflow
 import mlflow.sklearn
@@ -17,6 +16,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import sklearn.tree._tree
 
 
 def load_processed_data(data_path: str):
@@ -138,7 +138,11 @@ def train_and_evaluate_all(
             mlflow.log_params(clf.get_params())
             mlflow.log_metrics(metrics)
             
-            mlflow.sklearn.log_model(pipeline, name="model")
+            mlflow.sklearn.log_model(
+                pipeline,
+                artifact_path="model",
+                skops_trusted_types=["sklearn.tree._tree.Tree"],
+            )
 
             print(f"\n--- {model_name} Results ---")
             for metric, val in metrics.items():
