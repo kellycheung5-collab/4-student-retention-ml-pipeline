@@ -33,7 +33,7 @@ jobs:
 
       - name: Execute Pytest Suite
         run: |
-          pytest -v
+          python -m pytest -v
 
   docker-smoke-test:
     name: Docker Build & Health Check
