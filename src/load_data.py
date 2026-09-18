@@ -45,19 +45,20 @@ def load_and_preprocess_data(input_filename: str = "data.csv"):
 
 
 def load_and_prep_features(filename: str = "student_data_early_warning.csv"):
-    """Load processed CSV and return feature matrix X and target vector y."""
+    """Load processed CSV and return early-warning feature matrix X and target vector y."""
     processed_path = BASE_DIR / "data" / "processed" / filename
     if not processed_path.exists():
         load_and_preprocess_data()
 
     df = pd.read_csv(processed_path)
 
-    # Exclude target columns and non-feature text labels
-    drop_cols = [c for c in ["dropout_risk", "target_binary", "Target"] if c in df.columns]
+    # Exclude 2nd semester features to respect early-warning boundary & prevent target leakage
+    second_sem_cols = [c for c in df.columns if "2nd sem" in c]
+    drop_cols = [c for c in ["dropout_risk", "target_binary", "Target"] if c in df.columns] + second_sem_cols
+
     X = df.drop(columns=drop_cols)
     y = df["dropout_risk"]
 
-    # Select numeric features for baseline model compatibility
     X_numeric = X.select_dtypes(include=["number", "bool", "int64", "float64"])
 
     return X_numeric, y
