@@ -1,9 +1,9 @@
-from contextlib import asynccontextmanager
 import logging
-
-from pathlib import Path
 import uuid
-from typing import Any, Optional
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any
+
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query, Request, status
@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MLMODEL_DIR = BASE_DIR / "models" / "MLmodel"
 JOBLIB_PATH = BASE_DIR / "models" / "early_warning_pipeline.joblib"
 
-model: Optional[Any] = None
+model: Any | None = None
 
 
 def load_model_artifact():
@@ -37,8 +37,8 @@ def load_model_artifact():
                 f"Model artifact not found at {MLMODEL_DIR} or {JOBLIB_PATH}"
             )
             model = None
-    except Exception as e:
-        logger.error(f"Failed to load model artifact: {str(e)}")
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Failed to load model artifact: {e!s}")
         model = None
 
 
@@ -138,7 +138,6 @@ async def predict(
     threshold: float = Query(0.5, ge=0.0, le=1.0),
 ):
     """Predict student dropout risk probability."""
-    global model
     if model is None:
         load_model_artifact()
         if model is None:
@@ -168,9 +167,9 @@ async def predict(
             "decision_threshold": threshold,
             "top_risk_factors": [],
         }
-    except Exception as e:
-        logger.error(f"Prediction failure: {str(e)}")
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Prediction failure: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Prediction error: {str(e)}",
+            detail=f"Prediction error: {e!s}",
         )
