@@ -1,15 +1,17 @@
 import sys
 from pathlib import Path
 
+# Append repository root directory to sys.path
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
+# Import from src AFTER updating sys.path
 from src.load_data import load_and_prep_features
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.append(str(BASE_DIR))
 
 MODEL_DIR = BASE_DIR / "models"
 MODEL_PATH = MODEL_DIR / "early_warning_pipeline.joblib"
