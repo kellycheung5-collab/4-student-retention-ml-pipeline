@@ -6,11 +6,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def load_and_preprocess_data(
-    input_filename: str = "student_data_early_warning.csv",
+    input_filename: str = "data.csv",
 ):
     # Check potential locations for the raw CSV file
     possible_paths = [
         BASE_DIR / "data" / "raw" / input_filename,
+        BASE_DIR / "data" / "raw" / "student_data_early_warning.csv",
         BASE_DIR / input_filename,
         Path(input_filename),
     ]
