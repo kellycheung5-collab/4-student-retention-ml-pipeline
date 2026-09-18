@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 from src.load_data import load_and_prep_features
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.append(str(BASE_DIR))
+
 MODEL_DIR = BASE_DIR / "models"
 MODEL_PATH = MODEL_DIR / "early_warning_pipeline.joblib"
 
