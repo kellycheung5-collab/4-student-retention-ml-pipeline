@@ -1,52 +1,44 @@
-import os
-
+from pathlib import Path
 import pandas as pd
 
-
-def load_raw_data(filepath: str) -> pd.DataFrame:
-    """Loads raw CSV data with semicolon delimiter and cleans column names."""
-    df = pd.read_csv(filepath, sep=";")
-    df.columns = df.columns.str.strip()
-    return df
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def process_datasets(df: pd.DataFrame):
-    """Generates the full-information and early-warning datasets with binary targets."""
-    # Create binary target (Dropout = 1, Graduate/Enrolled = 0)
-    df["target_binary"] = df["Target"].apply(
-        lambda x: 1 if x == "Dropout" else 0
-    )
-
-    # Full information dataset
-    df_full = df.copy()
-
-    # Early warning dataset (drop 2nd semester features to prevent leakage)
-    second_sem_cols = [col for col in df.columns if "2nd sem" in col.lower()]
-    df_early = df.drop(columns=second_sem_cols)
-
-    return df_full, df_early
-
-
-def save_processed_data(
-    df_full: pd.DataFrame, df_early: pd.DataFrame, output_dir: str
+def load_and_preprocess_data(
+    input_filename: str = "student_data_early_warning.csv",
 ):
-    """Saves processed dataframes to CSV files in data/processed/."""
-    os.makedirs(output_dir, exist_ok=True)
+    # Check potential locations for the raw CSV file
+    possible_paths = [
+        BASE_DIR / "data" / "raw" / input_filename,
+        BASE_DIR / input_filename,
+        Path(input_filename),
+    ]
 
-    full_path = os.path.join(output_dir, "student_data_full.csv")
-    early_path = os.path.join(output_dir, "student_data_early_warning.csv")
+    input_path = next((p for p in possible_paths if p.exists()), None)
 
-    df_full.to_csv(full_path, index=False)
-    df_early.to_csv(early_path, index=False)
+    if input_path is None:
+        raise FileNotFoundError(
+            f"Could not locate '{input_filename}'. Ensured paths searched: {possible_paths}"
+        )
 
-    print(f"Saved full-information dataset to: {full_path}")
-    print(f"Saved early-warning dataset to:    {early_path}")
+    df = pd.read_csv(input_path)
+
+    # Ensure target column dropout_risk exists
+    if "dropout_risk" not in df.columns:
+        if "target_binary" in df.columns:
+            df["dropout_risk"] = df["target_binary"]
+        elif "Target" in df.columns:
+            df["dropout_risk"] = (df["Target"] == "Dropout").astype(int)
+        else:
+            raise KeyError("Target column missing from raw CSV dataset.")
+
+    output_dir = BASE_DIR / "data" / "processed"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(output_dir / "student_data_early_warning.csv", index=False)
+    df.to_csv(output_dir / "student_data_full.csv", index=False)
+    print(f"Processed datasets created successfully at {output_dir}")
 
 
 if __name__ == "__main__":
-    raw_csv_path = "data/raw/data.csv"
-    processed_dir = "data/processed"
-
-    df_raw = load_raw_data(raw_csv_path)
-    df_full, df_early = process_datasets(df_raw)
-    save_processed_data(df_full, df_early, processed_dir)
+    load_and_preprocess_data()

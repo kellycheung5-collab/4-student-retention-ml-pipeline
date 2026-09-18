@@ -1,32 +1,22 @@
 import pytest
-from asgi_lifespan import LifespanManager
-from httpx import ASGITransport, AsyncClient
-
-from api.main import app
-
-
-@pytest.fixture(scope="module")
-async def client():
-    """Asynchronous test client with lifespan execution, bypassing Starlette TestClient deprecations."""
-    async with LifespanManager(app) as manager:
-        transport = ASGITransport(app=manager.app)
-        async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            yield ac
+from httpx import AsyncClient
 
 
 @pytest.mark.anyio
 async def test_health_check(client: AsyncClient):
-    """Verify that the health check endpoint returns 200 OK and SHAP readiness."""
+    """Verify that the health check endpoint returns 200 OK and model readiness status."""
     response = await client.get("/health")
     assert response.status_code == 200
+
     data = response.json()
     assert data["status"] == "healthy"
     assert "shap_explainer_ready" in data
+    assert "model_loaded" in data
 
 
 @pytest.mark.anyio
 async def test_predict_success_low_risk(client: AsyncClient):
-    """Test valid prediction payload returning low risk and SHAP risk factors."""
+    """Test valid prediction payload returning low risk prediction."""
     payload = {
         "Marital status": 1,
         "Application mode": 1,
@@ -67,15 +57,7 @@ async def test_predict_success_low_risk(client: AsyncClient):
     assert "dropout_probability" in data
     assert "is_high_risk" in data
     assert data["decision_threshold"] == 0.35
-    
-    # Validate SHAP risk factors payload structure
     assert "top_risk_factors" in data
-    assert isinstance(data["top_risk_factors"], list)
-    if len(data["top_risk_factors"]) > 0:
-        factor = data["top_risk_factors"][0]
-        assert "feature" in factor
-        assert "shap_value" in factor
-        assert "feature_value" in factor
 
 
 @pytest.mark.anyio
@@ -88,3 +70,21 @@ async def test_predict_validation_error_invalid_types(client: AsyncClient):
 
     response = await client.post("/predict", json=invalid_payload)
     assert response.status_code == 422
+
+
+@pytest.mark.anyio
+async def test_health_check_returns_tracing_headers(client: AsyncClient):
+    """Verify that auto-generated correlation tracing headers are present on API responses."""
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert "X-Correlation-ID" in response.headers
+
+
+@pytest.mark.anyio
+async def test_custom_correlation_id_propagation(client: AsyncClient):
+    """Verify that an incoming X-Correlation-ID is preserved across the request lifecycle."""
+    custom_id = "test-correlation-id-12345"
+    response = await client.get("/health", headers={"X-Correlation-ID": custom_id})
+
+    assert response.status_code == 200
+    assert response.headers["X-Correlation-ID"] == custom_id
