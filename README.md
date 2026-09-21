@@ -20,9 +20,9 @@ End-to-end MLOps pipeline predicting student dropout risk using the UCI dataset.
 
 ## Cloud Endpoints
 
-* **Live API Base URL**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io)
-* **Swagger OpenAPI Specs**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs)
-* **Health Check**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health)
+* **Live API Base URL**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
+* **Swagger OpenAPI Specs**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
+* **Health Check**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
 
 ---
 
