@@ -230,3 +230,12 @@ async def predict(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Prediction error: {e!s}",
         )
+
+
+@app.get("/")
+def read_root():
+    return {
+        "message": "Student Retention Early-Warning API is live.",
+        "docs": "/docs",
+        "health": "/health"
+    }
