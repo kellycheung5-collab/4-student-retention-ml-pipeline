@@ -1,6 +1,9 @@
 # Student Retention ML Pipeline
 
-End-to-end MLOps pipeline predicting student dropout risk using the UCI dataset. Features a scikit-learn training pipeline, MLflow experiment tracking, SHAP explainability with a subgroup fairness audit, automated GitHub Actions CI/CD, and a containerized FastAPI REST API deployed to Azure Container Apps.
+End-to-end MLOps pipeline predicting student dropout risk using the Predict Students' Dropout and Academic Success dataset from UCI. Features a scikit-learn training pipeline, MLflow experiment tracking, SHAP explainability with a subgroup fairness audit, automated GitHub Actions CI/CD, and a containerized FastAPI REST API deployed to Azure Container Apps.
+
+* **UCI Dataset**: [https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success](https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success)
+
 
 ---
 
@@ -20,9 +23,9 @@ End-to-end MLOps pipeline predicting student dropout risk using the UCI dataset.
 
 ## Cloud Endpoints
 
-* **Live API Base URL**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
-* **Swagger OpenAPI Specs**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
-* **Health Check**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health) *(Archived — Cloud resources torn down post-verification to avoid continuous compute costs)*
+* **Live API Base URL**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io) *(Archived: Cloud resources torn down post-verification to avoid continuous compute costs)*
+* **Swagger OpenAPI Specs**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/docs) *(Archived: Cloud resources torn down post-verification to avoid continuous compute costs)*
+* **Health Check**: [https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health](https://student-dropout-api.ashyhill-c0196008.westus2.azurecontainerapps.io/health) *(Archived: Cloud resources torn down post-verification to avoid continuous compute costs)*
 
 ---
 
